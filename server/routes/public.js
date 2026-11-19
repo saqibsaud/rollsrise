@@ -5,7 +5,7 @@ const { HttpError } = require('../errors');
 const O = require('../orders');
 const { computeBill } = require('../bill');
 
-function publicRoutes({ db, events }) {
+function publicRoutes({ db, events, assistant }) {
   const r = express.Router();
   const changed = (code) => { events.emit(`table:${code}`); events.emit('kitchen'); events.emit('admin'); };
 
@@ -40,6 +40,11 @@ function publicRoutes({ db, events }) {
     const visit = O.requestBill(db, req.params.code);
     changed(req.params.code);
     res.json(await computeBill(db, visit.id));
+  });
+
+  r.post('/t/:code/ask', async (req, res) => {
+    const table = O.getTableByCode(db, req.params.code);
+    res.json(await assistant.ask({ db, tableNumber: table.number, messages: req.body?.messages }));
   });
 
   r.get('/t/:code/bill', async (req, res) => {
