@@ -3,6 +3,7 @@ const { getPublicMenu } = require('../menu');
 const { getSettings } = require('../settings');
 const { HttpError } = require('../errors');
 const O = require('../orders');
+const { computeBill } = require('../bill');
 
 function publicRoutes({ db, events }) {
   const r = express.Router();
@@ -35,10 +36,17 @@ function publicRoutes({ db, events }) {
     res.status(201).json(order);
   });
 
-  r.post('/t/:code/bill-request', (req, res) => {
+  r.post('/t/:code/bill-request', async (req, res) => {
     const visit = O.requestBill(db, req.params.code);
     changed(req.params.code);
-    res.json(visit);
+    res.json(await computeBill(db, visit.id));
+  });
+
+  r.get('/t/:code/bill', async (req, res) => {
+    const table = O.getTableByCode(db, req.params.code);
+    const v = O.getActiveVisit(db, table.id);
+    if (!v || v.status !== 'bill_requested') throw new HttpError(404, 'No bill yet');
+    res.json(await computeBill(db, v.id));
   });
 
   return r;
