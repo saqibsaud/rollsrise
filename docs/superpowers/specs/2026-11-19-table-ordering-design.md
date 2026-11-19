@@ -1,7 +1,7 @@
 # Rolls Rise Signature — Table Ordering System: Design
 
 Date: 2026-11-19
-Status: Draft, awaiting owner approval
+Status: Approved by owner 2026-11-19
 
 ## 1. Intent
 
@@ -191,6 +191,12 @@ Staff collect payment ─▶ "Mark paid & free table" ─▶ visit CLOSED, table
 - Daily automatic backup copy of the database file.
 - README with setup steps for the owner.
 
-## 12. Left to the builder
+## 12. Owner answers
+- GST applies; GSTIN and rate will be entered later in Settings. Bill shows GST lines only once set.
+- Runs on a **Windows laptop**: provide `start.bat` (double-click) and Windows setup steps.
+- **6 tables**, numbered 1–6, pre-created.
+- UPI ID will be added later in Settings; bill shows UPI QR only once set.
+
+## 13. Left to the builder
 Visual styling (follow the printed menu: white, black and deep red, serif headings), exact
 wording of screens, sound choice, file layout, test approach.
