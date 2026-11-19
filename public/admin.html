@@ -1,2 +1,149 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><title>Rolls Rise</title></head><body></body></html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Admin · Rolls Rise</title>
+  <link rel="stylesheet" href="/shared.css">
+  <style>
+    body.admin { min-height: 100vh; }
+    .a-top { background: var(--ink); color: #fff; padding: 12px max(16px, env(safe-area-inset-right, 0px)) 0 max(16px, env(safe-area-inset-left, 0px)); position: sticky; top: 0; z-index: 10; }
+    .a-top .row { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; max-width: 1200px; margin: 0 auto; }
+    .a-top h1 { font-size: 22px; }
+    .a-top h1 span { font-family: var(--body); font-size: 12px; font-weight: 500; letter-spacing: .22em; text-transform: uppercase; color: #BDB7AE; margin-left: 8px; }
+    .today { font-size: 14px; color: #E6E1DA; display: flex; gap: 14px; align-items: center; }
+    .today b { color: #fff; font-variant-numeric: tabular-nums; }
+    .today button { background: none; border: 1px solid #555; color: #ddd; border-radius: var(--r); padding: 4px 10px; cursor: pointer; font-size: 13px; }
+    nav.tabs { display: flex; gap: 2px; overflow-x: auto; max-width: 1200px; margin: 10px auto 0; scrollbar-width: none; }
+    nav.tabs button { background: none; border: 0; color: #BDB7AE; padding: 10px 14px; font-weight: 600; cursor: pointer; border-bottom: 3px solid transparent; white-space: nowrap; }
+    nav.tabs button.on { color: #fff; border-bottom-color: var(--red); }
+    nav.tabs .badge { background: var(--red); color: #fff; border-radius: 9px; font-size: 11px; padding: 1px 6px; margin-left: 4px; }
+    main.a-main { max-width: 1200px; margin: 0 auto; padding: 20px max(16px, env(safe-area-inset-right, 0px)) 60px max(16px, env(safe-area-inset-left, 0px)); }
+    .panel { display: grid; gap: 16px; }
+    .panel-head { display: flex; justify-content: space-between; align-items: end; gap: 12px; flex-wrap: wrap; }
+    .panel-head h2 { font-size: 24px; }
+    .hint { color: var(--muted); font-size: 14px; margin: 0; max-width: 70ch; }
+
+    /* Live tables */
+    .tables { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; align-items: start; }
+    .tcard { background: var(--surface); border: 1px solid var(--line); border-top: 5px solid #C9C3BA; border-radius: var(--r); padding: 14px; display: grid; gap: 10px; align-content: start; }
+    .tcard.ordering { border-top-color: #D29922; }
+    .tcard.bill_requested { border-top-color: var(--red); background: #FFF8F7; animation: pulse 1.6s ease-in-out infinite; }
+    @keyframes pulse { 50% { box-shadow: 0 0 0 4px rgba(155, 28, 28, .18); } }
+    .tcard .head { display: flex; justify-content: space-between; align-items: baseline; gap: 4px 10px; flex-wrap: wrap; }
+    .tcard .no { font-family: var(--display); font-size: 28px; font-weight: 700; }
+    .tcard .state { font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+    .tcard.bill_requested .state { color: var(--red); }
+    .tcard .amount { font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .tcard .actions { display: grid; gap: 6px; }
+    .confirm-box { background: var(--red-soft); padding: 10px; border-radius: var(--r); display: grid; gap: 8px; font-size: 14px; }
+    .confirm-box div { display: flex; gap: 6px; flex-wrap: wrap; }
+
+    /* Menu table */
+    .filters { display: flex; gap: 10px; flex-wrap: wrap; }
+    .filters .input { width: auto; flex: 1; min-width: 180px; }
+    .table-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); }
+    table.list { width: 100%; border-collapse: collapse; font-size: 14px; }
+    table.list th { text-align: left; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); padding: 10px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+    table.list td { padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+    table.list tr:last-child td { border-bottom: 0; }
+    table.list tr.cat-row td { background: var(--paper); font-weight: 600; letter-spacing: .08em; text-transform: uppercase; font-size: 12px; }
+    table.list .name { display: flex; gap: 8px; align-items: center; font-weight: 500; }
+    table.list .prices { font-variant-numeric: tabular-nums; color: var(--muted); white-space: nowrap; }
+    table.list .row-actions { display: flex; gap: 6px; justify-content: flex-end; }
+    tr.off td { opacity: .55; }
+    .toggle { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-size: 13px; white-space: nowrap; }
+    .toggle input { accent-color: var(--veg); width: 18px; height: 18px; }
+
+    /* Forms */
+    .form { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 18px; display: grid; gap: 14px; max-width: 760px; }
+    .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; }
+    .opt-row { display: grid; grid-template-columns: minmax(0, 1fr) 130px auto; gap: 8px; align-items: center; }
+    .radio-row { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; min-height: 44px; }
+    .radio-row label { display: inline-flex; gap: 6px; align-items: center; cursor: pointer; }
+    .form-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .err { color: var(--red); font-weight: 500; min-height: 1.2em; margin: 0; }
+    .photo-prev { width: 160px; aspect-ratio: 16 / 9; object-fit: cover; border-radius: var(--r); border: 1px solid var(--line); }
+    fieldset.box { border: 1px solid var(--line); border-radius: var(--r); padding: 14px; display: grid; gap: 12px; margin: 0; }
+    fieldset.box legend { padding: 0 6px; font-weight: 600; }
+
+    /* QR sheet */
+    .qr-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+    .qr-card { background: var(--surface); border: 1.5px solid var(--ink); padding: 18px; display: grid; gap: 6px; justify-items: center; text-align: center; position: relative; break-inside: avoid; }
+    .qr-card::before { content: ""; position: absolute; top: 10px; bottom: 10px; left: 8px; width: 5px; border-left: 1.5px solid var(--ink); border-right: 1.5px solid var(--red); }
+    .qr-card .r-name { font-family: var(--display); font-size: 20px; font-weight: 700; }
+    .qr-card .t-no { font-family: var(--script); font-size: 34px; line-height: 1; }
+    .qr-card .qr { width: 170px; }
+    .qr-card .scan { font-size: 12px; letter-spacing: .2em; text-transform: uppercase; font-weight: 600; }
+    .qr-card .url { font-size: 10px; color: var(--muted); word-break: break-all; }
+    .qr-card .remove { position: absolute; top: 6px; right: 6px; }
+
+    /* Login */
+    .login { max-width: 380px; margin: 10vh auto 0; padding: 0 16px; display: grid; gap: 14px; }
+
+    /* Bill dialog */
+    #billDialog .sheet-body { gap: 12px; }
+
+    @media print {
+      body * { visibility: hidden; }
+      .print-area, .print-area * { visibility: visible; }
+      .print-area { position: absolute; left: 0; top: 0; width: 100%; }
+      .no-print { display: none !important; }
+      .qr-grid { grid-template-columns: repeat(2, 1fr); }
+      dialog.sheet { box-shadow: none; }
+    }
+  </style>
+</head>
+<body class="admin">
+  <section class="login" id="setup" hidden>
+    <div class="menu-heading"><span class="script">Welcome</span><span class="title">Create admin password</span><span class="rule"></span></div>
+    <p class="hint">This is the first time the admin page has been opened. Choose a password for the owner and counter staff. It must be at least 6 characters.</p>
+    <form class="form" id="setupForm">
+      <label class="field"><span>New password</span><input class="input" id="setupPw" type="password" minlength="6" autocomplete="new-password" required></label>
+      <label class="field"><span>Type it again</span><input class="input" id="setupPw2" type="password" minlength="6" autocomplete="new-password" required></label>
+      <p class="err" id="setupErr" role="alert"></p>
+      <button class="btn btn-primary" type="submit">Create password</button>
+    </form>
+  </section>
+
+  <section class="login" id="login" hidden>
+    <div class="menu-heading"><span class="script">Rolls Rise</span><span class="title">Admin login</span><span class="rule"></span></div>
+    <form class="form" id="loginForm">
+      <label class="field"><span>Password</span><input class="input" id="loginPw" type="password" autocomplete="current-password" required></label>
+      <p class="err" id="loginErr" role="alert"></p>
+      <button class="btn btn-primary" type="submit">Log in</button>
+    </form>
+  </section>
+
+  <div id="app" hidden>
+    <header class="a-top no-print">
+      <div class="row">
+        <h1>Rolls Rise<span>Admin</span></h1>
+        <div class="today" id="today"></div>
+      </div>
+      <nav class="tabs" id="tabs">
+        <button type="button" data-tab="tables">Tables <span class="badge" id="billBadge" hidden></span></button>
+        <button type="button" data-tab="menu">Menu</button>
+        <button type="button" data-tab="qr">Tables &amp; QR codes</button>
+        <button type="button" data-tab="settings">Settings</button>
+        <button type="button" data-tab="ai">Customer questions</button>
+      </nav>
+    </header>
+    <main class="a-main" id="main"></main>
+  </div>
+
+  <dialog class="sheet" id="billDialog" aria-label="Bill">
+    <button class="sheet-close no-print" type="button" data-close aria-label="Close">×</button>
+    <div class="sheet-body">
+      <div class="print-area" id="billArea"></div>
+      <div class="form-actions no-print">
+        <button class="btn btn-dark" type="button" id="printBill">Print</button>
+        <button class="btn" type="button" data-close>Close</button>
+      </div>
+    </div>
+  </dialog>
+
+  <script src="/shared.js"></script>
+  <script src="/admin.js"></script>
+</body>
+</html>

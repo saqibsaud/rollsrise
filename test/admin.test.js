@@ -195,3 +195,12 @@ test('ai log is listed for admin', async () => {
   const log = (await a.get('/api/admin/ai-log').expect(200)).body;
   assert.equal(log[0].question, 'spicy?');
 });
+
+test('QR codes use the LAN address when admin is opened on localhost', () => {
+  const { publicOrigin } = require('../server/routes/admin');
+  assert.equal(publicOrigin('http', 'localhost:3000', ['192.168.1.20']), 'http://192.168.1.20:3000');
+  assert.equal(publicOrigin('http', '127.0.0.1:3000', ['192.168.1.20']), 'http://192.168.1.20:3000');
+  assert.equal(publicOrigin('http', 'localhost', ['10.0.0.5']), 'http://10.0.0.5');
+  assert.equal(publicOrigin('http', '192.168.1.20:3000', ['192.168.1.20']), 'http://192.168.1.20:3000');
+  assert.equal(publicOrigin('http', 'localhost:3000', []), 'http://localhost:3000');
+});

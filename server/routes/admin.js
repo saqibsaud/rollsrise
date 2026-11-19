@@ -1,4 +1,5 @@
 const fs = require('node:fs');
+const os = require('node:os');
 const path = require('node:path');
 const express = require('express');
 const multer = require('multer');
@@ -14,6 +15,20 @@ const { failDelay } = require('../auth');
 const PHOTO_TYPES = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
 const SECRET_KEYS = ['kitchen_pin_hash', 'admin_password_hash', 'ai_api_key'];
 const TEXT_KEYS = ['restaurant_name', 'tagline', 'address', 'phone', 'bill_footer', 'gstin', 'upi_id', 'ai_model'];
+
+function lanAddresses() {
+  return Object.values(os.networkInterfaces()).flat()
+    .filter(a => a && a.family === 'IPv4' && !a.internal).map(a => a.address);
+}
+
+// QR codes must hold an address phones can reach. If the admin page was opened as
+// "localhost" on the laptop itself, swap in the laptop's network address.
+function publicOrigin(protocol, host, lanIps = lanAddresses()) {
+  const [name, port] = String(host).split(':');
+  const local = ['localhost', '127.0.0.1', '[', '::1'].includes(name);
+  if (!local || !lanIps.length) return `${protocol}://${host}`;
+  return `${protocol}://${lanIps[0]}${port ? `:${port}` : ''}`;
+}
 
 function localMidnightIso() {
   const d = new Date();
@@ -180,7 +195,7 @@ function adminRoutes({ db, events, auth, dataDir }) {
   });
 
   r.get('/tables/qr', async (req, res) => {
-    const origin = `${req.protocol}://${req.get('host')}`;
+    const origin = publicOrigin(req.protocol, req.get('host'));
     const tables = db.prepare('SELECT number, code FROM tables WHERE deleted=0 ORDER BY number').all();
     res.json(await Promise.all(tables.map(async t => {
       const url = `${origin}/t/${t.code}`;
@@ -235,4 +250,4 @@ function adminRoutes({ db, events, auth, dataDir }) {
   return r;
 }
 
-module.exports = { adminRoutes };
+module.exports = { adminRoutes, publicOrigin, lanAddresses };
