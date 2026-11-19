@@ -1,2 +1,128 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><title>Rolls Rise</title></head><body></body></html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#FAF8F5">
+  <title>Rolls Rise Signature · Order</title>
+  <link rel="stylesheet" href="/shared.css">
+  <link rel="stylesheet" href="/customer.css">
+</head>
+<body class="customer">
+  <header class="top">
+    <div class="top-inner">
+      <a class="brand" href="#menu" aria-label="Menu">
+        <span class="brand-name">Rolls Rise</span>
+        <span class="brand-sub">Signature · <span id="tagline">Indian · Chinese · Arabian</span></span>
+      </a>
+      <div class="top-actions">
+        <a class="orders-link" href="#orders" id="ordersLink" hidden>My orders <span class="badge" id="ordersBadge" hidden></span></a>
+        <button class="table-pill" id="tablePill" type="button" hidden>Table <span id="tableNo"></span></button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Table picker -->
+    <section class="view" id="view-pick" hidden>
+      <div class="pick">
+        <div class="menu-heading"><span class="script">Welcome</span><span class="title">Choose your table</span><span class="rule"></span></div>
+        <p class="muted">Tap the number on your table. You can also scan the QR code on the table.</p>
+        <div class="table-grid" id="tableGrid"></div>
+      </div>
+    </section>
+
+    <!-- Menu -->
+    <section class="view" id="view-menu" hidden>
+      <div class="menu-tools">
+        <div class="tools-row">
+          <label class="search"><span class="visually-hidden">Search dishes</span>
+            <input class="input" id="search" type="search" placeholder="Search dishes or ingredients" autocomplete="off">
+          </label>
+          <label class="veg-toggle"><input type="checkbox" id="vegOnly"><span class="switch" aria-hidden="true"></span>Veg only</label>
+        </div>
+        <nav class="chips" id="chips" aria-label="Menu sections"></nav>
+      </div>
+      <div class="menu-list" id="menuList"></div>
+      <p class="empty" id="noResults" hidden>No dishes match your search.</p>
+    </section>
+
+    <!-- Cart -->
+    <section class="view" id="view-cart" hidden>
+      <div class="page">
+        <div class="menu-heading"><span class="script">Your</span><span class="title">Order</span><span class="rule"></span></div>
+        <div id="cartBody"></div>
+      </div>
+    </section>
+
+    <!-- Orders -->
+    <section class="view" id="view-orders" hidden>
+      <div class="page">
+        <div class="menu-heading"><span class="script">Table</span><span class="title">My orders</span><span class="rule"></span></div>
+        <div id="ordersBody"></div>
+      </div>
+    </section>
+
+    <!-- Bill -->
+    <section class="view" id="view-bill" hidden>
+      <div class="page">
+        <div class="menu-heading"><span class="script">Your</span><span class="title">Bill</span><span class="rule"></span></div>
+        <div id="billBody"></div>
+      </div>
+    </section>
+  </main>
+
+  <button class="ask-btn" id="askBtn" type="button" hidden>Ask about the menu</button>
+  <a class="cart-bar" id="cartBar" href="#cart" hidden><span id="cartSummary" class="num"></span><span>View order →</span></a>
+
+  <!-- Dish details -->
+  <dialog class="sheet" id="dishSheet" aria-labelledby="dishName">
+    <button class="sheet-close" type="button" data-close aria-label="Close">×</button>
+    <div id="dishPhoto"></div>
+    <form class="sheet-body" id="dishForm" method="dialog">
+      <div class="dish-head">
+        <h2 id="dishName"></h2>
+        <div class="dish-meta" id="dishMeta"></div>
+      </div>
+      <p id="dishDesc" class="dish-desc"></p>
+      <div>
+        <div class="caps muted">Ingredients</div>
+        <div class="ingredients" id="dishIngredients"></div>
+      </div>
+      <button class="btn btn-ghost btn-sm speak" type="button" id="speakDish">🔊 Read aloud</button>
+      <fieldset class="options" id="dishOptions"><legend class="caps muted">Choose</legend></fieldset>
+      <label class="field"><span>Note for the kitchen (optional)</span>
+        <input class="input" id="dishNote" maxlength="140" placeholder="e.g. less spicy">
+      </label>
+      <div class="add-row">
+        <div class="stepper" aria-label="Quantity">
+          <button type="button" id="qtyMinus" aria-label="Fewer">−</button>
+          <span id="qty" class="num" aria-live="polite">1</span>
+          <button type="button" id="qtyPlus" aria-label="More">+</button>
+        </div>
+        <button class="btn btn-primary add-btn" type="submit" id="dishAdd">Add</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Menu assistant -->
+  <dialog class="sheet chat" id="chatSheet" aria-labelledby="chatTitle">
+    <button class="sheet-close" type="button" data-close aria-label="Close">×</button>
+    <div class="sheet-body chat-body">
+      <div class="menu-heading"><span class="script">Ask</span><span class="title" id="chatTitle">About the menu</span><span class="rule"></span></div>
+      <div class="chat-log" id="chatLog" aria-live="polite">
+        <div class="msg bot">Hello! Ask me anything about our dishes: what's spicy, what's vegetarian, what goes well together. You can ask in English, Tamil, Urdu or Hindi.</div>
+      </div>
+      <form class="chat-form" id="chatForm">
+        <input class="input" id="chatInput" maxlength="500" placeholder="Type your question" autocomplete="off">
+        <button class="btn btn-ghost mic" type="button" id="micBtn" hidden aria-label="Speak your question">🎤</button>
+        <button class="btn btn-dark" type="submit">Send</button>
+      </form>
+      <p class="muted small">Answers come from our menu. For allergies, please check with our staff.</p>
+    </div>
+  </dialog>
+
+  <script src="/shared.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>
