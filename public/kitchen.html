@@ -1,2 +1,72 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><title>Rolls Rise</title></head><body></body></html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#141414">
+  <title>Kitchen · Rolls Rise</title>
+  <link rel="stylesheet" href="/shared.css">
+  <style>
+    :root { --k-bg: #141414; --k-col: #1D1D1D; --k-card: #262626; --k-line: #3A3A3A; --k-text: #F5F2EC; --k-muted: #A8A29A; --k-late: #E5484D; }
+    body.kitchen { background: var(--k-bg); color: var(--k-text); min-height: 100vh; }
+    .k-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px max(16px, env(safe-area-inset-right, 0px)) 12px max(16px, env(safe-area-inset-left, 0px)); border-bottom: 1px solid var(--k-line); }
+    .k-top h1 { font-size: 22px; }
+    .k-top h1 span { font-family: var(--body); font-weight: 500; font-size: 13px; letter-spacing: .2em; text-transform: uppercase; color: var(--k-muted); margin-left: 10px; }
+    .k-status { display: flex; gap: 12px; align-items: center; font-size: 14px; color: var(--k-muted); }
+    .dot { width: 10px; height: 10px; border-radius: 50%; background: #3FB950; display: inline-block; }
+    .dot.off { background: var(--k-late); }
+    .sound-banner { background: var(--red); color: #fff; border: 0; width: 100%; padding: 12px; font-weight: 600; font-size: 16px; cursor: pointer; }
+    .board { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding: 12px max(12px, env(safe-area-inset-right, 0px)) 24px max(12px, env(safe-area-inset-left, 0px)); align-items: start; }
+    @media (max-width: 700px) { .board { grid-template-columns: 1fr; } }
+    .col { background: var(--k-col); border-radius: 6px; padding: 10px; display: grid; gap: 10px; min-width: 0; }
+    .col h2 { font-family: var(--body); font-size: 14px; letter-spacing: .2em; text-transform: uppercase; font-weight: 600; display: flex; justify-content: space-between; padding: 4px 4px 8px; border-bottom: 2px solid var(--line-c, var(--k-line)); }
+    .col.new { --line-c: var(--red); }
+    .col.preparing { --line-c: #D29922; }
+    .col.ready { --line-c: #3FB950; }
+    .col > div { display: grid; gap: 10px; }
+    .empty-col { color: var(--k-muted); font-size: 14px; padding: 8px 4px; }
+    .card { background: var(--k-card); border-radius: 6px; padding: 14px; display: grid; gap: 10px; border-left: 5px solid var(--line-c, var(--k-line)); }
+    .card.flash { animation: flash 1s ease-in-out 3; }
+    @keyframes flash { 50% { background: #4A1F1F; } }
+    .card-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+    .table-no { font-family: var(--display); font-size: 30px; font-weight: 700; line-height: 1; }
+    .age { font-size: 15px; color: var(--k-muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .age.late { color: var(--k-late); font-weight: 600; }
+    .items { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-size: 19px; }
+    .items b { font-variant-numeric: tabular-nums; margin-right: 6px; }
+    .items .opt { color: #F0C674; }
+    .items .inote, .onote { display: block; font-size: 15px; color: #F0C674; font-style: italic; }
+    .card-actions { display: flex; gap: 8px; }
+    .card-actions .go { flex: 1; min-height: 52px; font-size: 18px; }
+    .card-actions .cancel { min-height: 52px; background: transparent; color: var(--k-muted); border-color: var(--k-line); }
+    .confirm { display: grid; gap: 8px; background: #3A1D1D; padding: 10px; border-radius: 4px; font-size: 15px; }
+    .confirm div { display: flex; gap: 8px; }
+    .login { max-width: 340px; margin: 12vh auto 0; padding: 0 16px; display: grid; gap: 14px; text-align: center; }
+    .login .input { background: var(--k-card); color: var(--k-text); border-color: var(--k-line); font-size: 28px; text-align: center; letter-spacing: .4em; }
+    .login .err { color: var(--k-late); min-height: 1.4em; }
+  </style>
+</head>
+<body class="kitchen">
+  <div class="k-top">
+    <h1>Kitchen<span>Rolls Rise</span></h1>
+    <div class="k-status"><span id="clock" class="num"></span><span><span class="dot off" id="liveDot"></span> <span id="liveText">Connecting…</span></span></div>
+  </div>
+  <button class="sound-banner" id="soundBanner" type="button" hidden>Tap here to turn on the new-order sound</button>
+
+  <form class="login" id="login" hidden>
+    <h2>Enter kitchen PIN</h2>
+    <input class="input" id="pin" type="password" inputmode="numeric" autocomplete="off" maxlength="8" aria-label="Kitchen PIN">
+    <button class="btn btn-primary" type="submit">Open kitchen screen</button>
+    <p class="err" id="loginErr" role="alert"></p>
+  </form>
+
+  <main class="board" id="board" hidden>
+    <section class="col new"><h2>New <span id="count-new">0</span></h2><div id="col-new"></div></section>
+    <section class="col preparing"><h2>Preparing <span id="count-preparing">0</span></h2><div id="col-preparing"></div></section>
+    <section class="col ready"><h2>Ready <span id="count-ready">0</span></h2><div id="col-ready"></div></section>
+  </main>
+
+  <script src="/shared.js"></script>
+  <script src="/kitchen.js"></script>
+</body>
+</html>
