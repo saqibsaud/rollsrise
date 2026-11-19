@@ -1,0 +1,24 @@
+{
+  "name": "rollsrise-ordering",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Table ordering system for Rolls Rise Signature",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "start": "node --no-warnings=ExperimentalWarning server/index.js",
+    "test": "node --no-warnings=ExperimentalWarning --test \"test/*.test.js\"",
+    "e2e": "playwright test test/e2e --trace off"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.10.0",
+    "express": "^5.3.0",
+    "multer": "^2.5.0",
+    "qrcode": "^1.5.4"
+  },
+  "devDependencies": {
+    "supertest": "^7.3.2"
+  }
+}
