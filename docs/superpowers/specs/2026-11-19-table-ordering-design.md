@@ -197,6 +197,14 @@ Staff collect payment ─▶ "Mark paid & free table" ─▶ visit CLOSED, table
 - **6 tables**, numbered 1–6, pre-created.
 - UPI ID will be added later in Settings; bill shows UPI QR only once set.
 
-## 13. Left to the builder
-Visual styling (follow the printed menu: white, black and deep red, serif headings), exact
-wording of screens, sound choice, file layout, test approach.
+## 13. Visual theme (owner chose Option A, "Printed menu")
+- Paper `#FAF8F5`, white surfaces `#FFFFFF`, ink `#1A1A1A`, muted `#6E6A64`, lines `#E6E1DA`, deep red accent `#9B1C1C`.
+- Headings: Playfair Display; body: Jost; section titles as on the card: script word ("Signature",
+  "Flavourful", "Aromatic"…) in Great Vibes above spaced capitals ("STARTERS"), with a thin black rule.
+- Black-and-red double vertical line down the left edge of the customer page, like the card.
+- Square-ish corners (2–4px). Veg/non-veg dots in standard green/red.
+- Kitchen screen: dark background, large white text, deep red accent.
+- Fonts are bundled locally (no internet needed).
+
+## 14. Left to the builder
+Exact wording of screens, sound choice, file layout, test approach.

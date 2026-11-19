@@ -20,7 +20,7 @@
 - Restaurant defaults: name `Rolls Rise Signature`, tagline `Indian · Chinese · Arabian`, address `Iqbal Road, (Near Jadeed Mosque) Vaniyambadi`, phone `8122776332`, bill footer `Thank you for dining with us. Every meal is made with passion and served with gratitude.`
 - GST, GSTIN, UPI ID: empty by default; bill shows tax lines / UPI QR only when set.
 - AI model id default: `claude-haiku-5-5` (stored in settings key `ai_model`).
-- Visual style: white background, black text, deep red accent `#9b1c1c`, serif headings (system serif stack, e.g. `Georgia, 'Times New Roman', serif`), mobile-first.
+- Visual style = spec §13 (Option A): tokens `--paper:#FAF8F5 --surface:#FFFFFF --ink:#1A1A1A --muted:#6E6A64 --line:#E6E1DA --red:#9B1C1C`; Playfair Display (headings), Jost (body), Great Vibes (script section word) — font files (woff2) committed in `public/fonts/` with `@font-face`; black+red double line on customer page's left edge; radius 2–4px; mobile-first. Mockup: https://claude.ai/artifact/LF7L9DvrPmXLRkFb1YoRDi
 - Runs on a **Windows laptop**: `start.bat` double-click start; default port `3000` (env `PORT`).
 - Default kitchen PIN `1234`. Admin password: none until first visit to `/admin`, which forces creating one.
 
