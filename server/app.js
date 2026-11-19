@@ -13,7 +13,7 @@ function createApp({ db, events, assistant, dataDir = path.join(__dirname, '..',
   app.disable('x-powered-by');
   app.use(express.json({ limit: '100kb' }));
 
-  const auth = createAuth();
+  const auth = createAuth(db);
   const ctx = { db, events, assistant, dataDir, auth };
 
   app.get('/api/events', (req, res) => {

@@ -46,11 +46,30 @@
     return el;
   }
 
+  // Live updates. The browser retries dropped connections by itself, but gives up for good when the
+  // server answers with an error (for example after a login expires). Then we reconnect ourselves
+  // and call onChange, so the page re-fetches and can show its login form.
   function live(channel, onChange) {
-    const es = new EventSource(`/api/events?channel=${encodeURIComponent(channel)}`);
-    es.addEventListener('changed', () => onChange());
-    es.addEventListener('open', () => onChange());
-    return es;
+    const listeners = [];
+    let es = null;
+    let stopped = false;
+    let timer = null;
+    function connect() {
+      es = new EventSource(`/api/events?channel=${encodeURIComponent(channel)}`);
+      es.addEventListener('changed', () => onChange());
+      es.addEventListener('open', () => onChange());
+      es.addEventListener('error', () => {
+        if (stopped || es.readyState !== EventSource.CLOSED) return;
+        clearTimeout(timer);
+        timer = setTimeout(() => { if (!stopped) { connect(); onChange(); } }, 3000);
+      });
+      for (const [type, fn] of listeners) es.addEventListener(type, fn);
+    }
+    connect();
+    return {
+      addEventListener(type, fn) { listeners.push([type, fn]); es.addEventListener(type, fn); },
+      close() { stopped = true; clearTimeout(timer); es.close(); },
+    };
   }
 
   let toastTimer;

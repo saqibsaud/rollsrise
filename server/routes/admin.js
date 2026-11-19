@@ -61,10 +61,13 @@ function adminRoutes({ db, events, auth, dataDir }) {
   });
 
   r.post('/login', async (req, res) => {
+    auth.checkLocked(req);
     if (!verifySecret(String(req.body?.password ?? ''), getSettings(db).admin_password_hash)) {
+      auth.recordFail(req);
       await failDelay();
       return res.status(401).json({ error: 'Wrong password' });
     }
+    auth.clearFails(req);
     auth.login(res, 'admin');
     res.json({ ok: true });
   });

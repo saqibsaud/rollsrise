@@ -39,3 +39,21 @@ test('kitchen SSE channel needs login', async () => {
   await request(app).get('/api/events?channel=table:nope').expect(404);
   await request(app).get('/api/events?channel=bogus').expect(400);
 });
+
+test('kitchen login survives a server restart', async () => {
+  const { createApp } = require('../server/app');
+  const { createEvents } = require('../server/events');
+  const { app, db } = makeTestApp();
+  const res = await request(app).post('/api/kitchen/login').send({ pin: '1234' }).expect(200);
+  const cookie = res.headers['set-cookie'][0].split(';')[0];
+  const restarted = createApp({ db, events: createEvents(), assistant: { ask: async () => ({}) } });
+  await request(restarted).get('/api/kitchen/orders').set('Cookie', cookie).expect(200);
+});
+
+test('too many wrong PINs locks login for a while', async () => {
+  const { app } = makeTestApp();
+  for (let i = 0; i < 5; i++) await request(app).post('/api/kitchen/login').send({ pin: '0000' }).expect(401);
+  const locked = await request(app).post('/api/kitchen/login').send({ pin: '1234' }).expect(429);
+  assert.match(locked.body.error, /Too many wrong attempts/);
+  await request(app).post('/api/admin/login').send({ password: 'whatever' }).expect(429);
+});

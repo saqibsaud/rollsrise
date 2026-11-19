@@ -7,11 +7,14 @@ function kitchenRoutes({ db, events, auth }) {
   const r = express.Router();
 
   r.post('/login', async (req, res) => {
+    auth.checkLocked(req);
     const pin = String(req.body?.pin ?? '');
     if (!verifySecret(pin, getSettings(db).kitchen_pin_hash)) {
+      auth.recordFail(req);
       await failDelay();
       return res.status(401).json({ error: 'Wrong PIN' });
     }
+    auth.clearFails(req);
     auth.login(res, 'kitchen');
     res.json({ ok: true });
   });
