@@ -19,6 +19,7 @@
     "qrcode": "^1.5.4"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "supertest": "^7.3.2"
   }
 }
